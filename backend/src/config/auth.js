@@ -1,7 +1,8 @@
 import 'dotenv/config'
 import jwt from 'jsonwebtoken'
 
-export const frontendOrigin = process.env.FRONTEND_ORIGIN
+// Browser Origin headers never include a path or trailing slash.
+export const frontendOrigin = new URL(process.env.FRONTEND_ORIGIN || 'http://localhost:5173').origin
 export const authCookieName = 'liftit_session'
 
 export function getJwtSecret() {

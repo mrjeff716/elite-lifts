@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import express from 'express'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
@@ -20,6 +21,7 @@ test('login cookie, authenticated requests, expiry, and origin protection', asyn
     toObject: () => ({ _id: 'test-user', email: 'test@example.com', password }),
   })
   const app = express()
+  app.use(cors({ origin: frontendOrigin, credentials: true }))
   app.use(express.json(), cookieParser(), checkOrigin)
   app.post('/login', postLogin)
   app.get('/private', isAuth, (req, res) => res.json({ id: req.userId }))
@@ -29,6 +31,14 @@ test('login cookie, authenticated requests, expiry, and origin protection', asyn
   await new Promise(resolve => server.once('listening', resolve))
   const base = `http://127.0.0.1:${server.address().port}`
   try {
+    const preflight = await fetch(base + '/login', {
+      method: 'OPTIONS',
+      headers: { Origin: frontendOrigin, 'Access-Control-Request-Method': 'POST' },
+    })
+    assert.equal(preflight.status, 204)
+    assert.equal(preflight.headers.get('access-control-allow-origin'), frontendOrigin)
+    assert.equal(preflight.headers.get('access-control-allow-credentials'), 'true')
+    assert.equal(frontendOrigin, new URL(frontendOrigin).origin)
     const login = await fetch(base + '/login', {
       method: 'POST', headers: { Origin: frontendOrigin, 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: 'test@example.com', password: 'test-password' }),

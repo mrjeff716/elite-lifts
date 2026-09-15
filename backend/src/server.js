@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1)
 app.use(bodyParser.json())
 
 getJwtSecret() // Fail at startup instead of accepting an insecure signing secret.
-app.use(cors({ origin: frontendOrigin || 'https://myelitelifts.vercel.app/', credentials: true }))
+app.use(cors({ origin: frontendOrigin, credentials: true }))
 app.use(cookieParser())
 app.use(checkOrigin)
 app.use(session({
