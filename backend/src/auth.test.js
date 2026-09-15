@@ -39,7 +39,7 @@ test('login cookie, authenticated requests, expiry, and origin protection', asyn
     assert.equal(body.user.password, undefined)
     const cookie = login.headers.get('set-cookie')
     assert.match(cookie, /HttpOnly/)
-    assert.match(cookie, /SameSite=Lax/)
+    assert.match(cookie, process.env.NODE_ENV === 'production' ? /SameSite=None/ : /SameSite=Lax/)
     assert.match(cookie, /Max-Age=3600/)
     if (process.env.NODE_ENV === 'production') assert.match(cookie, /Secure/)
     const headers = { Cookie: cookie.split(';')[0] }

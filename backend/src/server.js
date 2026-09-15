@@ -23,6 +23,9 @@ const __dirname = path.dirname(__filename)
 
 dotenv.config()
 
+// Render terminates HTTPS at its reverse proxy; secure OAuth cookies need this.
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1)
+
 app.use(bodyParser.json())
 
 getJwtSecret() // Fail at startup instead of accepting an insecure signing secret.

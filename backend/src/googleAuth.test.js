@@ -58,7 +58,7 @@ test('Google callback, state, new/returning users, app cookie, refresh and logou
     const cookie = first.headers.get('set-cookie')
     assert.match(cookie, new RegExp(authCookieName))
     assert.match(cookie, /HttpOnly/)
-    assert.match(cookie, /SameSite=Lax/)
+    assert.match(cookie, process.env.NODE_ENV === 'production' ? /SameSite=None/ : /SameSite=Lax/)
     const headers = { Cookie: cookie.split(';')[0] }
     assert.equal(users.length, 1)
     assert.equal(users[0].authProvider, 'google')
