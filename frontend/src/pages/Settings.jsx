@@ -40,7 +40,6 @@ const Settings = ({user, setUser}) => {
             Accept: "application/json",
           },
         },)
-        console.log(res)
         if (res.status !== 201) {
           toast.error('Error, please try again later')
         }
@@ -52,7 +51,6 @@ const Settings = ({user, setUser}) => {
           error.status = 500
           toast.error('Error, please try again later')
         }
-        console.log(error)
       }
     }
 
@@ -63,7 +61,6 @@ const Settings = ({user, setUser}) => {
             Accept: "application/json",
           },
         })
-        console.log(res)
         if (res.status !== 200) {
           toast.error('Error, please try again later')
         }
@@ -78,7 +75,6 @@ const Settings = ({user, setUser}) => {
           error.status = 500
           toast.error('Error, please try again later')
         }
-        console.log(error)
       }
     }
 
@@ -91,7 +87,6 @@ const Settings = ({user, setUser}) => {
             Accept: "application/json",
           },
         })
-        console.log(res)
         if (res.status !== 200) {
           toast.error('Error, please try again later')
         }
@@ -104,13 +99,11 @@ const Settings = ({user, setUser}) => {
         }
       } catch (error) {
         toast.error('Unable to delete your account. Please try again later')
-        console.log(error)
       } finally {
         setIsDeletingAccount(false)
       }
     }
 
-  console.log(user)
 
 
   return (

@@ -8,7 +8,6 @@ const FinishWorkout = ({ workout, setWorkout, user }) => {
 
   const navigate = useNavigate();
 
-  console.log(workout);
 
   useEffect(() => {
     const completedAt = new Date();
@@ -63,7 +62,6 @@ const FinishWorkout = ({ workout, setWorkout, user }) => {
           },
         },
       );
-      console.log(res);
       if (res.status === 201) {
         setWorkout((prev) => {
           return {
@@ -84,7 +82,6 @@ const FinishWorkout = ({ workout, setWorkout, user }) => {
       if (error.status === 400) {
         toast.error("Please fill in the required form");
       }
-      console.error(error);
     }
   }
 

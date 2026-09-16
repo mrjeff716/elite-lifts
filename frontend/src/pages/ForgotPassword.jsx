@@ -17,7 +17,6 @@ const ForgotPassword = () => {
       };
     } catch (error) {
       if (error.status === 422) return toast.error('Please insert a valid email');
-      console.log(error);
     }
   }
 

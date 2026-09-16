@@ -13,7 +13,6 @@ export default function WorkoutPage({workout, user, setWorkout}) {
   const [workouts, setWorkouts] = useState([])
   const navigate = useNavigate()
   const workoutPage = useRef()
-  console.log(workout)
 
   useEffect(() => {
     if (workoutPage.current !== null) {
@@ -46,7 +45,6 @@ export default function WorkoutPage({workout, user, setWorkout}) {
         if (error.response?.status ===  401 || error.response?.statusCode === 401) {
           navigate('/auth')
         }
-        console.log(error)
       }
     }
     checkIfWorkoutHasStarted()
@@ -66,7 +64,6 @@ export default function WorkoutPage({workout, user, setWorkout}) {
           setWorkouts(res.data.workouts)
         }
       } catch (error) {
-        console.log(error)
       } finally {
         setIsLoading(false)
       }
@@ -99,10 +96,8 @@ export default function WorkoutPage({workout, user, setWorkout}) {
       navigate(`/start-workout/${res.data.workout._id}`)
       
       if (res.status !== 201) {
-        console.log(res.message, res.data)
       }
     } catch (error) {
-      console.log(error)
     }
   }
 
@@ -118,11 +113,9 @@ export default function WorkoutPage({workout, user, setWorkout}) {
       navigate(`/workout`)
       
       if (res.status !== 200) {
-        console.log(res.message, res.data)
       }
       res.status === 200 && toast.success(res.data.message)
     } catch (error) {
-      console.log(error)
     } finally {
       setWorkout({
       user: user,
@@ -138,7 +131,6 @@ export default function WorkoutPage({workout, user, setWorkout}) {
     }
   }
 
-  console.log(workouts)
 
   function LoadWorkouts() {
     return workouts.map(w => {
@@ -185,7 +177,6 @@ export default function WorkoutPage({workout, user, setWorkout}) {
             className="rounded-xl border border-red-400/30 bg-red-500/10 px-6 py-3 font-semibold text-red-400 transition hover:bg-red-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
             onClick={() => {
               if (confirm('Are you sure you want to delete this workout')) {{
-                console.log('Workout Will be Deleted')
                 deleteWorkout()
               }}
             }}

@@ -15,7 +15,6 @@ const HomePage = ({ user }) => {
   const [posts, setPosts] = useState([]);
   const homePage = useRef(null);
 
-  console.log(posts);
 
   const navigate = useNavigate();
 
@@ -105,7 +104,6 @@ const HomePage = ({ user }) => {
           setPosts(res.data.posts);
         }
       } catch (error) {
-        console.error(error);
       }
     }
     getPosts();
@@ -122,7 +120,6 @@ const HomePage = ({ user }) => {
           setWorkoutsAll(res.data.workouts);
         }
       } catch (error) {
-        console.error(error);
       }
     }
     getWorkouts();
@@ -139,7 +136,6 @@ const HomePage = ({ user }) => {
           setWorkoutsMonth(res.data.workouts);
         }
       } catch (error) {
-        console.error(error);
       }
     }
     getWorkouts();
@@ -182,7 +178,7 @@ const HomePage = ({ user }) => {
             </div>
 
             <div className="w-11 h-11 rounded-full bg-card border border-border/20 flex items-center justify-center font-bold text-primary">
-              JK
+              {user && user.name[0]}
             </div>
           </section>
 

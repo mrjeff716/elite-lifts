@@ -52,7 +52,6 @@ const WorkoutDetails = () => {
         if (error.status === 401) {
           navigate("/auth");
         }
-        console.log(error);
       }
     }
     getWorkout();
@@ -95,7 +94,6 @@ const WorkoutDetails = () => {
           return wIndex + 1 <= 5 && workouts.push(w);
         });
       }
-      console.log(workout);
       const res =
         workout.aiAnalysis === undefined || workout?.aiAnalysis?.length < 1
           ? await axios.post(`/api/ai-analysis`, {
@@ -136,14 +134,11 @@ const WorkoutDetails = () => {
         toast.error("Too many requests, Please try again in a bit");
       else
         toast.error(error.message || "Unable to load or save the AI analysis");
-      console.log(error);
     } finally {
       setIsAiAnalysisLoading(false);
     }
   }
 
-  console.log(aiResponse);
-  console.log(isLoading);
 
   if (isLoading) {
     return <Loader />;

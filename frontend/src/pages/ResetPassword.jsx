@@ -13,7 +13,6 @@ const ResetPassword = () => {
   const userId = searchParams.get("userId"); 
   const navigate = useNavigate()
 
-  console.log(inputType);
 
   async function resetPassword() {
     try {
@@ -27,7 +26,6 @@ const ResetPassword = () => {
       }
     } catch (error) {
       if (error.status === 429) toast.error('Passwords do not match')
-      console.log(error)
     }
   }
 

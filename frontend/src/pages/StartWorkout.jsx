@@ -21,7 +21,6 @@ const StartWorkout = ({ user, workout, setWorkout }) => {
   const workoutId = useParams()._id;
   const navigate = useNavigate();
 
-  console.log(workout)
 
   useEffect(() => {
     setInterval(() => {
@@ -184,7 +183,6 @@ const StartWorkout = ({ user, workout, setWorkout }) => {
     return ex.sets.every(set => set.setType === 'Insert Set Type' ? false : true)
   })
 
-  console.log(isSetValid)
 
 
   if (chosenExercise.isExercisePageOpen) {

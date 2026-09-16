@@ -9,7 +9,6 @@ const PostWorkout = ({ workout, onCancel, isSubmitting = false }) => {
   const [description, setDescription] = useState("");
   const [includeExercises, setIncludeExercises] = useState(false);
   const navigate = useNavigate()
-  console.log(workout);
 
   async function handleSubmit(e) {
     try {
@@ -25,7 +24,6 @@ const PostWorkout = ({ workout, onCancel, isSubmitting = false }) => {
       if (res.status === 201) {
         toast.success(res.data.message)
         isSubmitting = false
-        console.log(res.data.newPost)
         setPostName("")
         setDescription("")
         setIncludeExercises(false)

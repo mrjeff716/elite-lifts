@@ -84,7 +84,6 @@ const Auth = ({ setUser }) => {
         navigate('/')
       }
     } catch (error) {
-        console.log(error.message)
         toast.error(error.response?.data?.message || 'Login failed. Please try again.')
     } finally {
       setPending(false)

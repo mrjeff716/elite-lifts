@@ -35,9 +35,7 @@ const ExercisePage = ({
 
   useEffect(() => {
     async function getExercises() {
-      console.log("function ran");
       try {
-        console.log(primaryMuscles);
         const res = await axios.get(`/api/${primaryMuscles}`, {
           headers: {
             Accept: "application/json",
@@ -46,7 +44,6 @@ const ExercisePage = ({
 
         /*const exercises = res.data.map(e => {
           const folderName = e.imageUrls[0].split('/')[3]
-          console.log(folderName)
           return {...e, imageUrls: `http://localhost:3000/images/exercises/Alternating_Floor_Press/0.jpg`}
         })*/
         setExercises(res.data);
@@ -56,7 +53,6 @@ const ExercisePage = ({
         if (error.status === 401 || error.statusCode === 401) {
           navigate("/auth");
         }
-        console.error("ERROR", error);
       }
     }
     getExercises();
