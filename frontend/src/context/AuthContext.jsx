@@ -11,7 +11,7 @@ export const AuthProvider = ({children}) => {
     setLoading(true)
     setError('')
     try {
-      const res = !window.location.href.includes('/reset-password') && await axios.get('/user', { timeout: 10000 })
+      const res = !window.location.href.includes('/reset-password') && await axios.get('/user')
       setUser(res.data.user)
     } catch (err) {
       setUser(null)

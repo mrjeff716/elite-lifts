@@ -20,7 +20,7 @@ import { useState, useEffect } from "react";
 import axios from "../api.js";
 import Loader from "../components/Loader.jsx";
 import { useNavigate } from "react-router";
-import { ChevronDown, Dumbbell } from "lucide-react";
+import { ChevronDown, Clock3, Dumbbell } from "lucide-react";
 
 const muscleImages = {
   chest, biceps, triceps, shoulders, abdominals, quadriceps,
@@ -71,6 +71,14 @@ const FeedPage = () => {
             const exercisesId = `post-exercises-${post._id}`;
             const muscle = (post.mostFocusedMuscle || "").replace(/"/g, "").trim().toLowerCase();
             const muscleImage = Object.hasOwn(muscleImages, muscle) ? muscleImages[muscle] : undefined;
+            const postedOn = new Date(post.createdAt).toLocaleDateString('en-Us', {
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric'
+            }).split(',')
+            const time = postedOn[1]
+            postedOn[1] = ` at ${time}`
+            postedOn.join("")
             return (
               <article
                 key={post._id}
@@ -89,9 +97,15 @@ const FeedPage = () => {
                         .slice(0, 2)
                         .join("")}
                     </div>
-                    <p className="min-w-0 break-words text-sm font-semibold text-text">
-                      {post.userName}
-                    </p>
+                    <div className="min-w-0">
+                      <p className="break-words text-sm font-semibold text-text">
+                        {post.userName}
+                      </p>
+                      <div className="mt-1 flex items-center gap-1.5 text-xs text-muted">
+                        <Clock3 size={12} aria-hidden="true" className="shrink-0 text-primary/70" />
+                        <span>Posted on<time className="ml-1" dateTime={postedOn}>{postedOn}</time></span>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="mt-4 sm:pl-12">

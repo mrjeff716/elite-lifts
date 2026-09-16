@@ -4,5 +4,6 @@ import axios from 'axios'
 export default axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
-  timeout: 50000,
+  // Render Free can take about a minute to wake after inactivity.
+  timeout: 90000,
 })

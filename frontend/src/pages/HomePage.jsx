@@ -5,21 +5,25 @@ import { useNavigate } from "react-router";
 import axios from "../api";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
+import { ArrowUpRight, Target } from "lucide-react";
 
 const HomePage = ({ user }) => {
-  const [workoutsAll, setWorkoutsAll] = useState([])
+  const [workoutsAll, setWorkoutsAll] = useState([]);
   const [workoutsMonth, setWorkoutsMonth] = useState([]);
   const [workoutsWeek, setWorkoutsWeek] = useState([]);
-  const [isPrPageOpened, setIsPrPageOpened] = useState(false)
-  const homePage = useRef(null)
+  const [isPrPageOpened, setIsPrPageOpened] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const homePage = useRef(null);
+
+  console.log(posts);
 
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (homePage.current !== null) {
-      homePage.current.scrollIntoView()
+      homePage.current.scrollIntoView();
     }
-  }, [])
+  }, []);
 
   let totalSeconds = 0;
 
@@ -29,7 +33,7 @@ const HomePage = ({ user }) => {
     const [hours, minutes, seconds] = workout.duration
       .trim()
       .split(":")
-      .map(Number); 
+      .map(Number);
 
     const durationSeconds = hours * 3600 + minutes * 60 + seconds;
 
@@ -42,58 +46,77 @@ const HomePage = ({ user }) => {
   const progress =
     user && ((workoutsWeek.length / user.workoutsPerWeek) * 100).toFixed(2);
 
+  let prAll = [];
+  workoutsAll.forEach((w) => {
+    w.exercises.map((wex) => {
+      wex.sets.map((set) => {
+        const date = new Date(w.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        return (
+          set.isPr && prAll.push({ ...set, exerciseName: wex.exercise, date })
+        );
+      });
+    });
+  });
 
-    let prAll = []
-  workoutsAll.forEach(w => {
-    w.exercises.map(wex => {
-      wex.sets.map(set => {
-        const date = new Date(w.createdAt).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
-        })
-        return set.isPr && prAll.push({...set, exerciseName: wex.exercise, date})
-      })
-    })
-  })
+  let prMonth = [];
+  workoutsMonth.forEach((w) => {
+    w.exercises.map((wex) => {
+      wex.sets.map((set) => {
+        const date = new Date(w.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        return (
+          set.isPr && prMonth.push({ ...set, exerciseName: wex.exercise, date })
+        );
+      });
+    });
+  });
 
-  let prMonth = []
-  workoutsMonth.forEach(w => {
-    w.exercises.map(wex => {
-      wex.sets.map(set => {
-        const date = new Date(w.createdAt).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
-        })
-        return set.isPr && prMonth.push({...set, exerciseName: wex.exercise, date})
-      })
-    })
-  })
+  let prWeek = [];
+  workoutsWeek.forEach((w) => {
+    w.exercises.map((wex) => {
+      wex.sets.map((set) => {
+        const date = new Date(w.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        return (
+          set.isPr && prWeek.push({ ...set, exerciseName: wex.exercise, date })
+        );
+      });
+    });
+  });
 
-
-  let prWeek = []
-  workoutsWeek.forEach(w => {
-    w.exercises.map(wex => {
-      wex.sets.map(set => {
-        const date = new Date(w.createdAt).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
-        })
-        return set.isPr && prWeek.push({...set, exerciseName: wex.exercise, date})
-      })
-    })
-  })
-
-  console.log({prAll, prMonth, prWeek})
+  useEffect(() => {
+    async function getPosts() {
+      try {
+        const res = await axios.get("/api/posts");
+        if (res.status === 401) {
+          return navigate("/auth");
+        }
+        if (res.status === 200) {
+          setPosts(res.data.posts);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getPosts();
+  }, []);
 
   useEffect(() => {
     async function getWorkouts() {
       try {
         const res = await axios.get("/api/workouts");
         if (res.status === 401) {
-          return navigate('/auth')
+          return navigate("/auth");
         }
         if (res.status === 200) {
           setWorkoutsAll(res.data.workouts);
@@ -105,13 +128,12 @@ const HomePage = ({ user }) => {
     getWorkouts();
   }, []);
 
-
   useEffect(() => {
     async function getWorkouts() {
       try {
         const res = await axios.get("/api/home/workouts-month");
         if (res.status === 400) {
-          return navigate('/auth')
+          return navigate("/auth");
         }
         if (res.status === 200) {
           setWorkoutsMonth(res.data.workouts);
@@ -134,8 +156,8 @@ const HomePage = ({ user }) => {
           setWorkoutsWeek(res.data.workouts);
         }
       } catch (error) {
-        toast('Please sign in')
-        error.status === 401 && navigate('/auth')
+        toast("Please sign in");
+        error.status === 401 && navigate("/auth");
       }
     }
     getWorkouts();
@@ -144,7 +166,10 @@ const HomePage = ({ user }) => {
   return (
     <div className="scroll-mt-10" ref={homePage}>
       {isPrPageOpened && (
-        <PersonalRecords onClose={() => setIsPrPageOpened(false)} pr={{all: prAll, month: prMonth, week: prWeek}} />
+        <PersonalRecords
+          onClose={() => setIsPrPageOpened(false)}
+          pr={{ all: prAll, month: prMonth, week: prWeek }}
+        />
       )}
       <Navbar />
       <div className="min-h-screen bg-background text-text px-4 py-6 md:px-8">
@@ -226,7 +251,7 @@ const HomePage = ({ user }) => {
 
           {/* Progress */}
           <section className="bg-card border border-border/10 rounded-2xl p-5 md:p-6">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
               <div>
                 <h2 className="text-xl font-bold">Weekly Progress</h2>
 
@@ -236,7 +261,14 @@ const HomePage = ({ user }) => {
                 </p>
               </div>
 
-              <span className="text-primary font-semibold">{`${progress}%`}</span>
+              {user.workoutsPerWeek !== 0 ? <span className="text-primary font-semibold">{`${progress}%`}</span> : (
+                <button className="group inline-flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-blue-300 shadow-sm transition-colors hover:border-primary/60 hover:bg-primary/20 hover:text-blue-200 active:bg-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+                onClick={() => navigate('/settings')}>
+                  <Target size={18} strokeWidth={1.8} aria-hidden="true" className="shrink-0" />
+                  Set a workout goal
+                  <ArrowUpRight size={16} aria-hidden="true" className="shrink-0 opacity-60 transition-opacity group-hover:opacity-100" />
+                </button>
+              )}
             </div>
 
             <div className="w-full h-3 bg-background rounded-full overflow-hidden">
@@ -263,52 +295,59 @@ const HomePage = ({ user }) => {
               </div>
 
               <div className="space-y-4">
-                {workoutsWeek.length === 0 ? <div className="flex flex-col items-center">
-                <p className="text-xl font-semibold">You did not workout this week yet</p>
-                <button
-                className="mt-6 bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:scale-[1.02] transition"
-                onClick={() => {
-                  navigate("/workout");
-                }}
-              >
-                Start Workout
-              </button>
-                </div>  : workoutsWeek.map((w, index) => {
-                  return (
-                    index + 1 <= 4 && (
-                      <div className="flex items-center justify-between bg-background rounded-xl p-4">
-                        <div>
-                          <h3 className="font-semibold">{w.workoutName}</h3>
+                {workoutsWeek.length === 0 ? (
+                  <div className="flex flex-col items-center">
+                    <p className="text-xl font-semibold">
+                      You did not workout this week yet
+                    </p>
+                    <button
+                      className="mt-6 bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:scale-[1.02] transition"
+                      onClick={() => {
+                        navigate("/workout");
+                      }}
+                    >
+                      Start Workout
+                    </button>
+                  </div>
+                ) : (
+                  workoutsWeek.map((w, index) => {
+                    return (
+                      index + 1 <= 4 && (
+                        <div className="flex items-center justify-between bg-background rounded-xl p-4">
+                          <div>
+                            <h3 className="font-semibold">{w.workoutName}</h3>
 
-                          <p className="text-muted text-sm mt-1">
-                            {w.workoutSplit}
-                          </p>
+                            <p className="text-muted text-sm mt-1">
+                              {w.workoutSplit}
+                            </p>
+                          </div>
+
+                          <div className="text-right">
+                            <p className="text-sm">{w.duration}</p>
+
+                            <p className="text-muted text-xs mt-1">
+                              {(Date.now() - new Date(w.updatedAt)) / 86400000 <
+                              1
+                                ? "Today"
+                                : (Date.now() - new Date(w.updatedAt)) /
+                                      86400000 <
+                                    2
+                                  ? "Yesterday"
+                                  : new Date(w.updatedAt).toLocaleDateString(
+                                      "en-us",
+                                      {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      },
+                                    )}
+                            </p>
+                          </div>
                         </div>
-
-                        <div className="text-right">
-                          <p className="text-sm">{w.duration}</p>
-
-                          <p className="text-muted text-xs mt-1">
-                            {(Date.now() - new Date(w.updatedAt)) / 86400000 < 1
-                              ? "Today"
-                              : (Date.now() - new Date(w.updatedAt)) /
-                                    86400000 <
-                                  2
-                                ? "Yesterday"
-                                : new Date(w.updatedAt).toLocaleDateString(
-                                    "en-us",
-                                    {
-                                      month: "short",
-                                      day: "numeric",
-                                      year: "numeric",
-                                    },
-                                  )}
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  );
-                })}
+                      )
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -317,56 +356,43 @@ const HomePage = ({ user }) => {
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-xl font-bold">Friends Activity</h2>
 
-                <button className="text-primary text-sm font-medium">
+                <Link to="/feed" className="text-primary text-sm font-medium">
                   View feed
-                </button>
+                </Link>
               </div>
 
               <div className="space-y-4">
-                <div className="flex gap-3 bg-background rounded-xl p-4">
-                  <div className="w-11 h-11 shrink-0 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold">
-                    A
-                  </div>
+                {posts.map((p, pIndex) => {
+                  return (
+                    pIndex + 1 <= 4 && (
+                      <div className="flex gap-3 bg-background rounded-xl p-4">
+                        <div className="w-11 h-11 shrink-0 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold">
+                          {p.userName[0]}
+                        </div>
 
-                  <div>
-                    <p className="text-sm leading-relaxed">
-                      <span className="font-semibold">Alex</span> completed a
-                      <span className="font-semibold"> Push Workout</span>
-                    </p>
+                        <div>
+                          <p className="text-sm leading-relaxed">
+                            <span className="font-bold">{p.userName}:</span>
+                            <span className="ml-1">{p.title}</span>
+                          </p>
 
-                    <p className="text-muted text-xs mt-1">45 minutes ago</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3 bg-background rounded-xl p-4">
-                  <div className="w-11 h-11 shrink-0 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold">
-                    S
-                  </div>
-
-                  <div>
-                    <p className="text-sm leading-relaxed">
-                      <span className="font-semibold">Sam</span> hit a new bench
-                      press PR
-                    </p>
-
-                    <p className="text-muted text-xs mt-1">2 hours ago</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3 bg-background rounded-xl p-4">
-                  <div className="w-11 h-11 shrink-0 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold">
-                    M
-                  </div>
-
-                  <div>
-                    <p className="text-sm leading-relaxed">
-                      <span className="font-semibold">Mike</span> completed Leg
-                      Day
-                    </p>
-
-                    <p className="text-muted text-xs mt-1">5 hours ago</p>
-                  </div>
-                </div>
+                          <p className="text-muted text-xs mt-1">
+                            {(Date.now() - new Date(p.createdAt)) / 86400000 < 1
+                              ? new Date(p.createdAt).toLocaleDateString('en-Us',{hour: "numeric", minute: "numeric"})
+                              : (Date.now() - new Date(p.createdAt)) /
+                                    86400000 <
+                                  2
+                                ? "Yesterday"
+                                : new Date(p.createdAt).toLocaleDateString('en-Us',{
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -377,13 +403,17 @@ const HomePage = ({ user }) => {
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <p className="text-muted text-sm">{ prMonth[0]?.exerciseName}</p>
+                <p className="text-muted text-sm">{prMonth[0]?.exerciseName}</p>
 
-                <h3 className="text-3xl font-bold mt-1">{ prMonth[0]?.weight}</h3>
+                <h3 className="text-3xl font-bold mt-1">
+                  {prMonth[0]?.weight || <span className="font-semibold">You dont have any PR's so far.</span>}
+                </h3>
               </div>
 
-              <button className="bg-background rounded-xl px-5 py-3 text-sm text-muted active:opacity-80 active:scale-105 transition"
-              onClick={() => setIsPrPageOpened(true)}>
+              <button
+                className="bg-background rounded-xl px-5 py-3 text-sm text-muted active:opacity-80 active:scale-105 transition"
+                onClick={() => setIsPrPageOpened(true)}
+              >
                 View Your Personal records
               </button>
             </div>
