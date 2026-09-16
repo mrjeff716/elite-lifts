@@ -29,7 +29,11 @@ if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1)
 app.use(bodyParser.json())
 
 getJwtSecret() // Fail at startup instead of accepting an insecure signing secret.
-app.use(cors({ origin: frontendOrigin, credentials: true }))
+const allowedOrigins = [
+  'https://myelitelifts.vercel.app',
+  'http://localhost:5173',
+]
+app.use(cors({ origin:allowedOrigins, credentials: true }))
 app.use(cookieParser())
 app.use(checkOrigin)
 app.use(session({
@@ -37,7 +41,7 @@ app.use(session({
   secret: process.env.COOKIE_KEY || getJwtSecret(),
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 10 * 60 * 1000 }
+  cookie: { httpOnly: true, sameSite: 'none', secure: process.env.NODE_ENV === 'production', maxAge: 10 * 60 * 1000 }
 }))
 
 app.use(passport.initialize());
