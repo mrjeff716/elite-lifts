@@ -261,7 +261,7 @@ const HomePage = ({ user }) => {
                 </p>
               </div>
 
-              {user.workoutsPerWeek !== 0 ? <span className="text-primary font-semibold">{`${progress}%`}</span> : (
+              {user && user.workoutsPerWeek !== 0 ? <span className="text-primary font-semibold">{`${progress}%`}</span> : (
                 <button className="group inline-flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-blue-300 shadow-sm transition-colors hover:border-primary/60 hover:bg-primary/20 hover:text-blue-200 active:bg-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
                 onClick={() => navigate('/settings')}>
                   <Target size={18} strokeWidth={1.8} aria-hidden="true" className="shrink-0" />
