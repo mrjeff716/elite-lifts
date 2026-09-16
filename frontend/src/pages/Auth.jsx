@@ -56,7 +56,7 @@ const Auth = ({ setUser }) => {
         if (res.status === 201) {
           toast.success("Signed up successfully");
           setUser(res.data.user)
-          navigate('/', { replace: true })
+          setAuth('login')
         }
       } else {
         return toast.error('Error, passwords do not match')

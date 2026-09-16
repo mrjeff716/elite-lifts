@@ -73,7 +73,7 @@ const App = () => {
           <div role="alert" className="min-h-screen flex flex-col items-center justify-center gap-4 text-text px-6 text-center">
             <p>{error}</p><button onClick={refreshUser} className="rounded-xl bg-primary px-6 py-3 text-white">Try again</button>
           </div>
-        ) : user ? <Outlet /> : <Navigate to="/auth" replace />}>
+        ) : !user && <Navigate to="/auth" replace />}>
         <Route path="/workout" element={<WorkoutPage workout={workout} setWorkout={setWorkout} user={user} setUser={setUser} />}></Route>
         <Route
           path="/start-workout/:_id"

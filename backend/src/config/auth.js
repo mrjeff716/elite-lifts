@@ -19,7 +19,7 @@ export const authCookieOptions = {
   // The hosted API and frontend are on different sites.
   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   path: '/',
-  maxAge: 60 * 60 * 1000,
+  maxAge: 60 * 60 * 10000,
 }
 
 export function setAuthCookie(res, user) {
