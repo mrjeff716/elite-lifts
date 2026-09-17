@@ -129,7 +129,7 @@ const HomePage = ({ user }) => {
     async function getWorkouts() {
       try {
         const res = await axios.get("/api/home/workouts-month");
-        if (res.status === 400) {
+        if (res.status === 401) {
           return navigate("/auth");
         }
         if (res.status === 200) {
@@ -152,8 +152,7 @@ const HomePage = ({ user }) => {
           setWorkoutsWeek(res.data.workouts);
         }
       } catch (error) {
-        toast("Please sign in");
-        error.status === 401 && navigate("/auth");
+        error.status === 500 && toast.error('Error, please try again later')
       }
     }
     getWorkouts();
