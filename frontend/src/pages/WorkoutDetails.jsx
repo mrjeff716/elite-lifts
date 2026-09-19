@@ -357,7 +357,7 @@ const WorkoutDetails = () => {
 
                 return (
                   <article
-                    key={ex._id ?? exIndex}
+                    key={ex._id ?? workout.exercises.length - exIndex}
                     className="overflow-hidden rounded-2xl border border-border/10 bg-card transition-colors hover:border-primary/40"
                   >
                     <button
@@ -371,7 +371,7 @@ const WorkoutDetails = () => {
                       className="flex w-full items-center gap-3 p-4 text-left outline-none transition hover:bg-white/[0.02] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:gap-4 sm:p-5"
                     >
                       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-sm font-bold text-primary sm:h-12 sm:w-12">
-                        {exIndex + 1}
+                        {workout.exercises.length - exIndex}
                       </span>
 
                       <span className="min-w-0 flex-1">

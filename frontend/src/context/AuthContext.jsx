@@ -16,6 +16,7 @@ export const AuthProvider = ({children}) => {
     } catch (err) {
       setUser(null)
       if (err.response?.status !== 401) setError('Unable to connect to Elite Lifts. Check that the server is running and try again.')
+        
     } finally {
       setLoading(false)
     }

@@ -37,7 +37,7 @@ export function googleCallback(passport) {
       }
       try {
         setAuthCookie(res, user)
-        return res.redirect(`${frontendOrigin}/`)
+        return window.location.href = `${frontendOrigin}/`
       } catch (error) {
         return next(error)
       }

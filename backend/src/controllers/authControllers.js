@@ -2,13 +2,11 @@ import bcrypt from 'bcrypt'
 import User from '../models/User.js'
 import { validationResult } from 'express-validator'
 import { authCookieName, authCookieOptions, setAuthCookie } from '../config/auth.js'
-import { Resend } from 'resend'
+import sendEmail from '../config/sendEmail.js'
 import dotenv from 'dotenv'
 import crypto from 'crypto'
 
 dotenv.config()
-
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 export const postSignup = async (req, res, next) => {
   try {
@@ -38,25 +36,113 @@ export const postSignup = async (req, res, next) => {
     await user.save()
     setAuthCookie(res, user)
     const { password: passwordHash, ...publicUser } = user.toObject()
-    const { data, error } = await resend.emails.send({
-      from: 'Acme <onboarding@resend.dev>',
-      to: 'thisisjeffry77@gmail.com',
-      subject: 'Elite Lifts Account Creation',
-      html: `<h1>Subject: Welcome to Liftit 💪
-            Hey {{name}},
-            Welcome to Liftit! You’re ready to log your workouts, track your progress, and make every session count.
-            Start by logging your first workout—your progress starts here.
-            <a href="http://localhost:5173/workout">[Start your first workout]</a>
-            See you at your next session,
-            The Liftit Team</h1>`,
-    });
+    const safeName = String(name ?? '').replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[char]));
+    await sendEmail(email, 'Elite Lifts Account Creation',
+      `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Welcome to Elite Lifts</title>
+        </head>
+        <body style="margin:0;padding:0;background-color:#0b1120;font-family:Arial,Helvetica,sans-serif;">
+          <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+            Your account is ready. Let’s make your next workout count.
+          </div>
 
-    if (error) {
-      const error = new Error(`Couldn't send the email, please try again later`)
-      throw error
-    }
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+            style="background-color:#0b1120;">
+            <tr>
+              <td align="center" style="padding:40px 16px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                  style="max-width:560px;">
 
-    console.log({ data });
+                  <tr>
+                    <td style="padding:0 0 24px;color:#60a5fa;font-size:18px;font-weight:700;letter-spacing:3px;">
+                      ELITE LIFTS
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="padding:36px 28px;background-color:#111c30;border:1px solid #263449;border-top:4px solid #3b82f6;border-radius:16px;">
+                      <p style="margin:0 0 16px;color:#93c5fd;font-size:12px;font-weight:700;letter-spacing:2px;">
+                        YOUR FIRST REP STARTS HERE
+                      </p>
+
+                      <h1 style="margin:0 0 20px;color:#f8fafc;font-size:30px;line-height:1.25;">
+                        Welcome, ${safeName}!
+                      </h1>
+
+                      <p style="margin:0 0 28px;color:#cbd5e1;font-size:16px;line-height:1.7;">
+                        Your Elite Lifts account is ready. Whether you’re chasing
+                        a personal best or building a consistent routine, you now
+                        have a place to track every step.
+                      </p>
+
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                        style="background-color:#17243a;border-radius:12px;">
+                        <tr>
+                          <td style="padding:22px;">
+                            <p style="margin:0 0 14px;color:#f8fafc;font-size:16px;font-weight:700;">
+                              Make your next workout count.
+                            </p>
+                            <p style="margin:0 0 10px;color:#cbd5e1;font-size:14px;line-height:1.6;">
+                              <strong style="color:#93c5fd;">Log your workouts</strong><br>
+                              Keep your exercises, sets, and reps in one place.
+                            </p>
+                            <p style="margin:0 0 10px;color:#cbd5e1;font-size:14px;line-height:1.6;">
+                              <strong style="color:#93c5fd;">See your progress</strong><br>
+                              Look back at your sessions and see how far you’ve come.
+                            </p>
+                            <p style="margin:0;color:#cbd5e1;font-size:14px;line-height:1.6;">
+                              <strong style="color:#93c5fd;">Build consistency</strong><br>
+                              Show up, put in the work, and keep moving forward.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <table role="presentation" cellspacing="0" cellpadding="0"
+                        style="margin-top:28px;">
+                        <tr>
+                          <td align="center" bgcolor="#2563eb" style="border-radius:8px;">
+                            <a href="https://myelitelifts.vercel.app/"
+                              style="display:inline-block;padding:16px 28px;border:1px solid #2563eb;border-radius:8px;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;">
+                              Open Elite Lifts &rarr;
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p style="margin:28px 0 0;color:#94a3b8;font-size:14px;line-height:1.7;">
+                        See you at your next session,<br>
+                        <strong style="color:#e2e8f0;">The Elite Lifts Team</strong>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td align="center" style="padding:24px 12px;color:#94a3b8;font-size:12px;line-height:1.7;">
+                      You received this email because this address was used to create
+                      an Elite Lifts account.<br>
+                      If you didn’t create an account, you can ignore this email.
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+        `)
+
     res.status(201).json({ message: 'User created successfully', user: publicUser })
     console.log('Signed up successfully')
   } catch (error) {
@@ -165,17 +251,91 @@ export const resetPassword = async (req, res, next) => {
       user.resetToken = token;
       user.resetTokenExpiration = Date.now() + 3600000
       user.save()
-      resend.emails.send({
-        to: email,
-        from: 'onBoarding@resend.dev',
-        subject: 'Password reset',
-        html: `
-          <h1>You requested a password reset</h1>
-          <h3>Forgot your password? It happens. Click below to choose a new one and get back to tracking your progress</h3>
-          <p>Click this <a href="http://localhost:5173/reset-password/${token}?userId=${user._id}">link</a> to set a new password
-          <p>If you didn’t request a password reset, you can ignore this email. Your password will stay the same.</p>
-          `
-      })
+      //http://localhost:5173/reset-password/${token}?userId=${user._id}
+      sendEmail(email, 'Elite Lifts Account Password Reset', `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset your password</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0b1120;font-family:Arial,Helvetica,sans-serif;">
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+    Reset your Elite Lifts password and get back to your training.
+  </div>
+
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+    style="background-color:#0b1120;">
+    <tr>
+      <td align="center" style="padding:40px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+          style="max-width:560px;">
+
+          <tr>
+            <td style="padding-bottom:24px;color:#60a5fa;font-size:18px;font-weight:700;letter-spacing:3px;">
+              ELITE LIFTS
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:36px 28px;background-color:#111c30;border:1px solid #263449;border-top:4px solid #3b82f6;border-radius:16px;">
+              <p style="margin:0 0 16px;color:#93c5fd;font-size:12px;font-weight:700;letter-spacing:2px;">
+                PASSWORD RESET
+              </p>
+
+              <h1 style="margin:0 0 20px;color:#f8fafc;font-size:30px;line-height:1.25;">
+                Let’s get you back in.
+              </h1>
+
+              <p style="margin:0 0 28px;color:#cbd5e1;font-size:16px;line-height:1.7;">
+                We received a request to reset your Elite Lifts password.
+                Click the button below to choose a new one.
+              </p>
+
+              <table role="presentation" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center" bgcolor="#2563eb" style="border-radius:8px;">
+                    <a href="https://myelitelifts.vercel.app/reset-password/${encodeURIComponent(token)}?userId=${encodeURIComponent(user._id.toString())}"
+                      style="display:inline-block;padding:16px 28px;border:1px solid #2563eb;border-radius:8px;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;">
+                      Reset my password &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:28px 0 0;padding:18px;background-color:#17243a;border-radius:10px;color:#cbd5e1;font-size:14px;line-height:1.7;">
+                Didn’t request this? You can ignore this email.
+                Your password will stay unchanged.
+              </p>
+
+              <p style="margin:24px 0 8px;color:#94a3b8;font-size:12px;line-height:1.7;">
+                If the button doesn’t work, copy and paste this link into your browser:
+              </p>
+
+              <p style="margin:0;color:#93c5fd;font-size:12px;line-height:1.7;word-break:break-all;">
+                https://myelitelifts.vercel.app/reset-password/${encodeURIComponent(token)}?userId=${encodeURIComponent(user._id.toString())}
+              </p>
+
+              <p style="margin:28px 0 0;color:#94a3b8;font-size:14px;line-height:1.7;">
+                The Elite Lifts Team
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:24px 12px;color:#94a3b8;font-size:12px;line-height:1.7;">
+              Keep this link private. It lets you reset your password.
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`)
       res.status(200).json({ message: 'An email has been sent to reset your account', user })
     })
   } catch (err) {
@@ -193,7 +353,7 @@ export const postNewPassword = async (req, res, next) => {
       error.status = 429
       throw error
     }
-    console.log({newPassword, userId, token})
+    console.log({ newPassword, userId, token })
     const user = await User.findOne({
       resetToken: token,
       resetTokenExpiration: { $gt: Date.now() },
@@ -205,7 +365,7 @@ export const postNewPassword = async (req, res, next) => {
     user.resetToken = null
     user.resetTokenExpiration = undefined
     await user.save()
-    res.status(201).json({message: 'Password reset successfully'})
+    res.status(201).json({ message: 'Password reset successfully' })
   } catch (err) {
     next(err);
   }

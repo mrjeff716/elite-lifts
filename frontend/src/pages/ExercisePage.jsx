@@ -676,10 +676,14 @@ const ExercisePage = ({
         <>
           {isLoading && <Loader />}
           <section className="fixed flex flex-col">
-            <MoveLeft
-              className="fixed top-5 left-5 size-16 text-primary bg-slate-600 p-4 rounded-full cursor-pointer hover:opacity-80 transition"
+            <button
+              type="button"
+              aria-label="Back to muscle groups"
+              className="group fixed top-5 left-5 z-10 flex size-11 items-center justify-center rounded-full border border-primary/20 bg-card text-primary shadow-lg shadow-black/20 transition-colors hover:border-primary/50 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card active:bg-primary/20"
               onClick={() => setPrimaryMuscles("")}
-            />
+            >
+              <MoveLeft aria-hidden="true" className="size-5 transition-transform motion-safe:group-hover:-translate-x-0.5" />
+            </button>
           </section>
           <section
             ref={ref}
@@ -687,24 +691,32 @@ const ExercisePage = ({
           >
             <div className="flex justify-between">
               {!isLoading && (
-                <ArrowLeft
-                  className="size-20 absolute top-24 left-5 cursor-pointer text-slate-200"
+                <button
+                  type="button"
+                  aria-label="Scroll muscle groups left"
+                  className="group absolute top-24 left-5 z-10 flex size-11 items-center justify-center rounded-full border border-primary/20 bg-card text-primary shadow-lg shadow-black/20 transition-colors hover:border-primary/50 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card active:bg-primary/20"
                   onClick={() => {
                     return scroll("left");
                   }}
-                />
+                >
+                  <ArrowLeft aria-hidden="true" className="size-5 transition-transform motion-safe:group-hover:-translate-x-0.5" />
+                </button>
               )}
               <MuscleImages
                 setPrimaryMuscles={setPrimaryMuscles}
                 setIsLoading={setIsLoading}
               />
               {!isLoading && (
-                <ArrowRight
-                  className="size-20 absolute top-24 right-5 cursor-pointer text-slate-200"
+                <button
+                  type="button"
+                  aria-label="Scroll muscle groups right"
+                  className="group absolute top-24 right-5 z-10 flex size-11 items-center justify-center rounded-full border border-primary/20 bg-card text-primary shadow-lg shadow-black/20 transition-colors hover:border-primary/50 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card active:bg-primary/20"
                   onClick={() => {
                     return scroll("right");
                   }}
-                />
+                >
+                  <ArrowRight aria-hidden="true" className="size-5 transition-transform motion-safe:group-hover:translate-x-0.5" />
+                </button>
               )}
             </div>
           </section>

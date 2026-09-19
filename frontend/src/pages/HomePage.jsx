@@ -98,12 +98,15 @@ const HomePage = ({ user }) => {
       try {
         const res = await axios.get("/api/posts");
         if (res.status === 401) {
-          return navigate("/auth");
+          return window.location.href = '/auth';
         }
         if (res.status === 200) {
           setPosts(res.data.posts);
         }
       } catch (error) {
+        if (error.response?.status ===  401 || error.response?.statusCode === 401) {
+          navigate('/auth')
+        }
       }
     }
     getPosts();
@@ -114,12 +117,15 @@ const HomePage = ({ user }) => {
       try {
         const res = await axios.get("/api/workouts");
         if (res.status === 401) {
-          return navigate("/auth");
+          return window.location.href = '/auth';
         }
         if (res.status === 200) {
           setWorkoutsAll(res.data.workouts);
         }
       } catch (error) {
+        if (error.response?.status ===  401 || error.response?.statusCode === 401) {
+          navigate('/auth')
+        }
       }
     }
     getWorkouts();
@@ -130,12 +136,15 @@ const HomePage = ({ user }) => {
       try {
         const res = await axios.get("/api/home/workouts-month");
         if (res.status === 401) {
-          return navigate("/auth");
+          return window.location.href = '/auth';
         }
         if (res.status === 200) {
           setWorkoutsMonth(res.data.workouts);
         }
       } catch (error) {
+        if (error.response?.status ===  401 || error.response?.statusCode === 401) {
+          navigate('/auth')
+        }
       }
     }
     getWorkouts();
@@ -145,7 +154,7 @@ const HomePage = ({ user }) => {
     async function getWorkouts() {
       try {
         const res = await axios.get("/api/home/workouts-week");
-        /*if (res.status === 400) {
+        /*if (res.status === 401) {
           return navigate('/auth')
         }*/
         if (res.status === 200) {
@@ -153,6 +162,9 @@ const HomePage = ({ user }) => {
         }
       } catch (error) {
         error.status === 500 && toast.error('Error, please try again later')
+        if (error.response?.status ===  401 || error.response?.statusCode === 401) {
+          navigate('/auth')
+        }
       }
     }
     getWorkouts();
@@ -251,12 +263,12 @@ const HomePage = ({ user }) => {
                 <h2 className="text-xl font-bold">Weekly Progress</h2>
 
                 <p className="text-muted text-sm mt-1">
-                  You completed {workoutsWeek.length} out of{" "}
-                  {user ? user.workoutsPerWeek : " "} workouts.
+                  {user && user.workoutsPerWeek !== undefined && user && user.workoutsPerWeek !== 0  ?  `You completed ${workoutsWeek.length} out of ${" "}
+                  ${user ? user.workoutsPerWeek : " "} workouts.` : 'Set a workout goal to begin tracking your workouts throughout the week'}
                 </p>
               </div>
 
-              {user && user.workoutsPerWeek !== 0 ? <span className="text-primary font-semibold">{`${progress}%`}</span> : (
+              {user && user.workoutsPerWeek !== undefined && user && user.workoutsPerWeek !== 0 ? <span className="text-primary font-semibold">{`${progress}%`}</span> : (
                 <button className="group inline-flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-blue-300 shadow-sm transition-colors hover:border-primary/60 hover:bg-primary/20 hover:text-blue-200 active:bg-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
                 onClick={() => navigate('/settings')}>
                   <Target size={18} strokeWidth={1.8} aria-hidden="true" className="shrink-0" />

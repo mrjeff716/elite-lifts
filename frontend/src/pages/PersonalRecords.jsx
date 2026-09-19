@@ -1,13 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-// Static examples — replace these with your own records when ready.
-const records = [
-  { exercise: "Barbell Bench Press", muscle: "Chest", weight: 80, reps: 5, date: "Sep 10, 2026", improvement: "+5 kg" },
-  { exercise: "Barbell Squat", muscle: "Legs", weight: 120, reps: 3, date: "Sep 8, 2026", improvement: "+10 kg" },
-  { exercise: "Deadlift", muscle: "Back", weight: 140, reps: 1, date: "Sep 6, 2026", improvement: "+5 kg" },
-  { exercise: "Overhead Press", muscle: "Shoulders", weight: 45, reps: 6, date: "Sep 2, 2026", improvement: "+2.5 kg" },
-];
-
 const PersonalRecords = ({ onClose, pr }) => {
   const dialogRef = useRef(null);
   const [period, setPeriod] = useState("month");

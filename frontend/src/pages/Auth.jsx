@@ -78,10 +78,9 @@ const Auth = ({ setUser }) => {
         password: loginInfo.password,
       });
       if (res.status === 200) {
-        
         setUser(res.data.user)
         toast.success("Logged in successfully");
-        navigate('/')
+        window.location.href = '/'
       }
     } catch (error) {
         toast.error(error.response?.data?.message || 'Login failed. Please try again.')

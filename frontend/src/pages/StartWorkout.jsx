@@ -38,8 +38,8 @@ const StartWorkout = ({ user, workout, setWorkout }) => {
 
       setDuration({
         hours: totalHours,
-        minutes: totalMinutes,
-        seconds: totalSeconds,
+        minutes: totalMinutes.padStart(2, '0'),
+        seconds: totalSeconds.padStart(2, '0'),
       });
     }, 250);
   }, []);

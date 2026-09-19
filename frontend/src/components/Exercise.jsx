@@ -61,7 +61,7 @@ const Exercise = (props) => {
       >
         <div className="aspect-video w-full shrink-0 bg-white">
         <img
-          src={`http://localhost:3000${props.exercise.imageUrls[0]}`}
+          src={`${import.meta.env.VITE_API_URL}${props.exercise.imageUrls[0]}`}
           alt={props.exercise.name}
           loading="lazy"
           className="block w-full h-full object-contain"
