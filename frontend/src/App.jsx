@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Routes, Navigate, Outlet } from "react-router";
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from './context/AuthContext'
+import axios from './api.js'
 import HomePage from "./pages/HomePage";
 import ExercisePage from "./pages/ExercisePage";
 import ExerciseDetailsPage from "./pages/ExerciseDetailsPage";
@@ -30,6 +31,26 @@ const App = () => {
       completed: false,
     },
   );
+
+  useEffect(() => {
+    async function getUser() {
+      try {
+        const res = !window.location.href.includes('/auth') && await axios.get('/user')
+        if (res.status === 401) {
+          window.location.href = '/auth'
+        } else {
+          return res
+        }
+      } catch (error) {
+        if (error.status === 401) {
+          window.location.href = '/auth'
+        }
+      }
+    }
+    const interval = setInterval(async() => await getUser(), 5000)
+    
+    return () => clearInterval(interval)
+  })
 
   useEffect(() => {
     localStorage.setItem("workout", JSON.stringify(workout));

@@ -105,7 +105,8 @@ const HomePage = ({ user }) => {
         }
       } catch (error) {
         if (error.response?.status ===  401 || error.response?.statusCode === 401) {
-          navigate('/auth')
+          //navigate('/auth')
+          console.log(error)
         }
       }
     }
@@ -124,7 +125,8 @@ const HomePage = ({ user }) => {
         }
       } catch (error) {
         if (error.response?.status ===  401 || error.response?.statusCode === 401) {
-          navigate('/auth')
+          //navigate('/auth')
+          console.log(error)
         }
       }
     }
@@ -136,14 +138,15 @@ const HomePage = ({ user }) => {
       try {
         const res = await axios.get("/api/home/workouts-month");
         if (res.status === 401) {
-          return window.location.href = '/auth';
+          //return window.location.href = '/auth';
         }
         if (res.status === 200) {
           setWorkoutsMonth(res.data.workouts);
         }
       } catch (error) {
         if (error.response?.status ===  401 || error.response?.statusCode === 401) {
-          navigate('/auth')
+          //navigate('/auth')
+          console.log(error)
         }
       }
     }
@@ -162,9 +165,9 @@ const HomePage = ({ user }) => {
         }
       } catch (error) {
         error.status === 500 && toast.error('Error, please try again later')
-        if (error.response?.status ===  401 || error.response?.statusCode === 401) {
+        /*if (error.response?.status ===  401 || error.response?.statusCode === 401) {
           navigate('/auth')
-        }
+        }*/
       }
     }
     getWorkouts();
