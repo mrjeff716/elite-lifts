@@ -26,7 +26,7 @@ const HomePage = ({ user }) => {
 
   let totalSeconds = 0;
 
-  workoutsMonth.forEach((workout) => {
+  workoutsMonth && workoutsMonth.forEach((workout) => {
     if (!workout.duration?.trim()) return;
 
     const [hours, minutes, seconds] = workout.duration
@@ -46,7 +46,7 @@ const HomePage = ({ user }) => {
     user && ((workoutsWeek.length / user.workoutsPerWeek) * 100).toFixed(2);
 
   let prAll = [];
-  workoutsAll.forEach((w) => {
+  workoutsAll && workoutsAll.forEach((w) => {
     w.exercises.map((wex) => {
       wex.sets.map((set) => {
         const date = new Date(w.createdAt).toLocaleDateString("en-US", {
@@ -62,7 +62,7 @@ const HomePage = ({ user }) => {
   });
 
   let prMonth = [];
-  workoutsMonth.forEach((w) => {
+  workoutsMonth && workoutsMonth.forEach((w) => {
     w.exercises.map((wex) => {
       wex.sets.map((set) => {
         const date = new Date(w.createdAt).toLocaleDateString("en-US", {
@@ -78,7 +78,7 @@ const HomePage = ({ user }) => {
   });
 
   let prWeek = [];
-  workoutsWeek.forEach((w) => {
+  workoutsWeek && workoutsWeek.forEach((w) => {
     w.exercises.map((wex) => {
       wex.sets.map((set) => {
         const date = new Date(w.createdAt).toLocaleDateString("en-US", {
@@ -372,7 +372,7 @@ const HomePage = ({ user }) => {
               </div>
 
               <div className="space-y-4">
-                {posts.map((p, pIndex) => {
+                {posts && posts.map((p, pIndex) => {
                   return (
                     pIndex + 1 <= 4 && (
                       <div className="flex gap-3 bg-background rounded-xl p-4">

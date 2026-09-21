@@ -8,6 +8,7 @@ import MuscleImages from "../components/MuscleGroups";
 import Loader from "../components/Loader.jsx";
 import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router";
+import { toast } from "react-hot-toast";
 
 const ExercisePage = ({
   isExercisePageOpen,
@@ -21,6 +22,7 @@ const ExercisePage = ({
   const [exercises, setExercises] = useState([]);
   const ref = useRef();
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const exercisesPage = useRef()
@@ -34,9 +36,15 @@ const ExercisePage = ({
   }, [])
 
   useEffect(() => {
+    if (!primaryMuscles) return;
+    const controller = new AbortController();
+    setIsLoading(true);
+    setExercises([]);
+    setErrorMessage("");
     async function getExercises() {
       try {
         const res = await axios.get(`/api/${primaryMuscles}`, {
+          signal: controller.signal,
           headers: {
             Accept: "application/json",
           },
@@ -46,17 +54,28 @@ const ExercisePage = ({
           const folderName = e.imageUrls[0].split('/')[3]
           return {...e, imageUrls: `http://localhost:3000/images/exercises/Alternating_Floor_Press/0.jpg`}
         })*/
+        if (!Array.isArray(res.data)) {
+          throw new Error('Expected an exercise array from the API');
+        }
+        if (controller.signal.aborted) return;
         setExercises(res.data);
         //setSearchResult(res.data)
         setIsLoading(false);
       } catch (error) {
-        if (error.status === 401 || error.statusCode === 401) {
+        if (controller.signal.aborted) return;
+        if (error.response?.status === 401) {
           navigate("/auth");
+          return;
         }
+        setErrorMessage("Unable to load exercises. Please try again.");
+        toast.error(errorMessage.length > 1 ? errorMessage : 'Error, please try again later')
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
       }
     }
     getExercises();
-  }, [primaryMuscles]);
+    return () => controller.abort();
+  }, [primaryMuscles, navigate]);
 
   const scroll = (direction) => {
     if (ref.current) {
@@ -729,6 +748,7 @@ const ExercisePage = ({
             />
           </section>
           <section className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-4 gap-12">
+            {errorMessage && <p role="alert" className="col-span-full text-center text-text">{errorMessage}</p>}
             <Exercises setIsLoading={setIsLoading} isLoading={isLoading} />
           </section>
         </>
