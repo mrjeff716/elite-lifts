@@ -5,7 +5,8 @@ import axios from '../api'
 import Loader from '../components/Loader'
 
 const formatValue = (value) => value ? value.replace(/_/g, ' ') : 'Not specified'
-const imageUrl = (path) => new URL(path, axios.defaults.baseURL).href
+const imageUrl = (path) =>
+  `${axios.defaults.baseURL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
 
 const ExerciseDetails = () => {
   const [exercise, setExercise] = useState(null)

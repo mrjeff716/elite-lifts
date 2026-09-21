@@ -41,7 +41,7 @@ app.use(session({
   secret: process.env.COOKIE_KEY || getJwtSecret(),
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: 'none', secure: process.env.NODE_ENV === 'production', maxAge: 10 * 60 * 1000 }
+  cookie: { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 10 * 60 * 1000 }
 }))
 
 app.use(passport.initialize());

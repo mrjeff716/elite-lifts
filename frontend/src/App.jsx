@@ -47,7 +47,7 @@ const App = () => {
         }
       }
     }
-    const interval = setInterval(async() => await getUser(), 5000)
+    const interval = setInterval(async() => await getUser(), 1000)
     
     return () => clearInterval(interval)
   })
