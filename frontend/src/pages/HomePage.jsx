@@ -454,11 +454,13 @@ const HomePage = ({ user }) => {
                   <p className="text-muted text-sm mt-1">Browse the library</p>
                 </button>
               </Link>
-              <button className="col-span-2 bg-card border border-border/10 rounded-2xl p-5 text-left hover:border-primary/40 transition md:col-span-1">
+              <Link to="/feed" className="col-span-2 bg-card border border-border/10 rounded-2xl p-5 hover:border-primary/40 transition md:col-span-1">
+              <button className="text-left">
                 <p className="text-primary font-semibold">Social Feed</p>
 
                 <p className="text-muted text-sm mt-1">See friends' workouts</p>
               </button>
+              </Link>
             </div>
           </section>
         </div>

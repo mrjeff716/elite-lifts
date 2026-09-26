@@ -1,219 +1,297 @@
 import axios from "../api";
 import Navbar from "../components/Navbar";
-import { useNavigate } from 'react-router'
-import { useEffect, useState, useRef } from 'react'
-import Loader from '../components/Loader'
-import Workout from '../components/Workout'
-import { toast } from 'react-hot-toast'
+import { useNavigate } from "react-router";
+import { useEffect, useState, useRef } from "react";
+import Loader from "../components/Loader";
+import Workout from "../components/Workout";
+import { toast } from "react-hot-toast";
 
-export default function WorkoutPage({workout, user, setWorkout}) {
-  const [isWorkoutCompleted, setIsWorkoutCompleted] = useState(true)
-  const [isLoading, setIsLoading] = useState(true)
-  const [workoutId, setWorkoutId] = useState('')
-  const [workouts, setWorkouts] = useState([])
-  const navigate = useNavigate()
-  const workoutPage = useRef()
+export default function WorkoutPage({ workout, user, setWorkout }) {
+  const [isWorkoutCompleted, setIsWorkoutCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [workoutId, setWorkoutId] = useState("");
+  const [workouts, setWorkouts] = useState([]);
+  const navigate = useNavigate();
+  const workoutPage = useRef();
 
   useEffect(() => {
     if (workoutPage.current !== null) {
-      workoutPage.current.scrollIntoView()
+      !isLoading && workoutPage.current.scrollIntoView();
     }
-  }, [])
+  }, []);
 
-  useEffect(() => {  //safety useEffect
+  useEffect(() => {
+    //safety useEffect
     setWorkout((prevWorkout) => {
-      return {...prevWorkout, user: user, workoutName: 'My workout', workoutSplit: 'My Split'}
-    })
-  }, [])
+      return {
+        ...prevWorkout,
+        user: user,
+        workoutName: "My workout",
+        workoutSplit: "My Split",
+      };
+    });
+  }, []);
 
   useEffect(() => {
     async function checkIfWorkoutHasStarted() {
       try {
-        const res = await axios.get('/api/workout-status', {
+        const res = await axios.get("/api/workout-status", {
           headers: {
-            'Accept': 'application/json',
-          }
-        })
+            Accept: "application/json",
+          },
+        });
         if (res.data.workoutCompleted == false) {
-          setIsWorkoutCompleted(false)
-          setWorkoutId(res.data.workoutSession._id)
+          setIsWorkoutCompleted(false);
+          setWorkoutId(res.data.workoutSession._id);
         }
         if (res.data.workoutCompleted == true) {
-          setIsWorkoutCompleted(true)
+          setIsWorkoutCompleted(true);
         }
       } catch (error) {
-        if (error.response?.status ===  401 || error.response?.statusCode === 401) {
-          navigate('/auth')
+        if (
+          error.response?.status === 401 ||
+          error.response?.statusCode === 401
+        ) {
+          navigate("/auth");
         }
+      } finally {
+        setIsLoading(false);
       }
     }
-    checkIfWorkoutHasStarted()
-  }, [navigate])
-
+    checkIfWorkoutHasStarted();
+  }, [navigate]);
 
   useEffect(() => {
     async function getWorkouts() {
       try {
-        const res = await axios.get('/api/workouts', {
+        const res = await axios.get("/api/workouts", {
           headers: {
-
-            'Accept': 'application/json',
-          }
-        })
+            Accept: "application/json",
+          },
+        });
         if (res.status === 200) {
-          setWorkouts(res.data.workouts)
+          setWorkouts(res.data.workouts);
         }
       } catch (error) {
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-    getWorkouts()
-  }, [])
+    getWorkouts();
+  }, []);
 
   async function startWorkout() {
     try {
-      const res = await axios.post('/api/start-workout', {
-        user: workout.user,
-        workoutSplit: workout.workoutSplit || 'My split',
-        workoutName: workout.workoutName,
-        duration: workout.duration,
-        exercises: workout.exercises,
-        createdAt: new Date().toISOString(),
-        notes: workout.notes,
-        completed: workout.completed
-      }, {
-        headers: {
-          'Accept': 'application/json',
-        }
-      })
-      
-      setWorkoutId(res.data.workout._id.toString())
-      setWorkout(prevWorkout => {
-        return {...prevWorkout, createdAt: res.data.workout.createdAt}
-      })
+      const res = await axios.post(
+        "/api/start-workout",
+        {
+          user: workout.user,
+          workoutSplit: workout.workoutSplit || "My split",
+          workoutName: workout.workoutName,
+          duration: workout.duration,
+          exercises: workout.exercises,
+          createdAt: new Date().toISOString(),
+          notes: workout.notes,
+          completed: workout.completed,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+          },
+        },
+      );
 
-      navigate(`/start-workout/${res.data.workout._id}`)
-      
+      setWorkoutId(res.data.workout._id.toString());
+      setWorkout((prevWorkout) => {
+        return { ...prevWorkout, createdAt: res.data.workout.createdAt };
+      });
+
+      navigate(`/start-workout/${res.data.workout._id}`);
+
       if (res.status !== 201) {
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
-
 
   async function deleteWorkout() {
     try {
       const res = await axios.delete(`/api/delete-workout/${workoutId}`, {
         headers: {
-          'Accept': 'application/json',
-        }
-      })
+          Accept: "application/json",
+        },
+      });
 
-      navigate(`/workout`)
-      
+      navigate(`/workout`);
+
       if (res.status !== 200) {
       }
-      res.status === 200 && toast.success(res.data.message)
+      res.status === 200 && toast.success(res.data.message);
     } catch (error) {
     } finally {
       setWorkout({
-      user: user,
-      workoutSplit: "My split",
-      workoutName: "My workout",
-      duration: '',
-      exercises: [],
-      notes: "",
-      createdAt: '',
-      completed: false,
-    })
-    setIsWorkoutCompleted(true)
+        user: user,
+        workoutSplit: "My split",
+        workoutName: "My workout",
+        duration: "",
+        exercises: [],
+        notes: "",
+        createdAt: "",
+        completed: false,
+      });
+      setIsWorkoutCompleted(true);
     }
   }
 
-
   function LoadWorkouts() {
-    return workouts.map(w => {
-      return <Workout workout={w} />
-    })
+    return workouts.map((w) => {
+      return <Workout workout={w} />;
+    });
+  }
+
+  if (isLoading) {
+    return (
+      <div className="scroll-mt-10" ref={workoutPage}>
+        <Navbar />
+
+        <main
+          role="status"
+          aria-label="Loading your workouts"
+          className="min-h-screen bg-background px-4 py-6 text-text md:px-8"
+        >
+          <span className="sr-only">Loading your workouts…</span>
+
+          <div
+            aria-hidden="true"
+            className="mx-auto max-w-5xl motion-safe:animate-pulse"
+          >
+            {/* Hero skeleton */}
+            <section className="rounded-3xl border border-border/10 bg-card p-6 md:p-8">
+              <div className="h-4 w-24 rounded bg-primary/20" />
+
+              <div className="mt-4 h-8 w-full max-w-xl rounded-lg bg-white/15 md:h-10" />
+
+              <div className="mt-5 space-y-2">
+                <div className="h-4 w-full max-w-lg rounded bg-white/10" />
+                <div className="h-4 w-2/3 max-w-sm rounded bg-white/10" />
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <div className="h-12 w-44 rounded-xl bg-primary/20" />
+                <div className="h-12 w-44 rounded-xl bg-white/5" />
+              </div>
+            </section>
+
+            {/* Workout history */}
+            <section className="mt-8">
+              <h2 className="text-2xl font-bold">Your Workouts</h2>
+              <p className="mt-1 text-sm text-muted">
+                Loading your recent training sessions…
+              </p>
+
+              <div className="mt-4 space-y-4">
+                {[1, 2, 3].map((card) => (
+                  <div
+                    key={card}
+                    className="rounded-2xl border border-border/10 bg-card p-5"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-3">
+                        <div
+                          className={`h-5 rounded bg-white/15 ${
+                            card === 2 ? "w-2/3 max-w-40" : "w-3/4 max-w-56"
+                          }`}
+                        />
+                        <div className="h-4 w-1/2 max-w-28 rounded bg-white/10" />
+                      </div>
+
+                      <div className="h-4 w-20 shrink-0 rounded bg-white/10 sm:w-24" />
+                    </div>
+
+                    <div className="mt-5 flex gap-6 text-sm">
+                      {["Duration", "Exercises", "Sets"].map((label) => (
+                        <div key={label}>
+                          <p className="text-muted">{label}</p>
+                          <div className="mt-2 h-4 w-10 rounded bg-white/15" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        </main>
+
+        <div className="h-32 bg-background" />
+      </div>
+    );
   }
 
   return (
     <div className="scroll-mt-10" ref={workoutPage}>
       <Navbar />
-    <div className="min-h-screen bg-background text-text px-4 py-6 md:px-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="min-h-screen bg-background text-text px-4 py-6 md:px-8">
+        <div className="max-w-5xl mx-auto">
+          {/* Hero */}
+          <section className="bg-card border border-border/10 rounded-3xl p-6 md:p-8">
+            <p className="text-primary font-medium text-sm">Time to train</p>
 
-        {/* Hero */}
-        <section className="bg-card border border-border/10 rounded-3xl p-6 md:p-8">
-          <p className="text-primary font-medium text-sm">
-            Time to train
-          </p>
+            <h1 className="text-3xl md:text-4xl font-bold mt-2">
+              Make today stronger than yesterday.
+            </h1>
 
-          <h1 className="text-3xl md:text-4xl font-bold mt-2">
-            Make today stronger than yesterday.
-          </h1>
+            <p className="text-muted mt-3 max-w-xl">
+              Start your workout, track your exercises, and keep building your
+              progress one session at a time.
+            </p>
 
-          <p className="text-muted mt-3 max-w-xl">
-            Start your workout, track your exercises, and keep building your
-            progress one session at a time.
-          </p>
-
-          
-          <div className="mt-6 flex flex-wrap gap-3">
-          <button className="bg-primary hover:bg-primaryHover text-white font-semibold px-6 py-3 rounded-xl transition"
-          onClick={async() => {
-            if (isWorkoutCompleted) {
-              await startWorkout()
-            } else if (isWorkoutCompleted === false) {
-              return workoutId && navigate(`/start-workout/${workoutId}`)
-            }
-          }}>
-            {isWorkoutCompleted ? 'Start Workout' : 'Continue Workout'}
-          </button>
-          <button
-            type="button"
-            hidden={isWorkoutCompleted}
-            className="rounded-xl border border-red-400/30 bg-red-500/10 px-6 py-3 font-semibold text-red-400 transition hover:bg-red-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
-            onClick={() => {
-              if (confirm('Are you sure you want to delete this workout')) {{
-                deleteWorkout()
-              }}
-            }}
-          >
-            Discard Workout
-          </button>
-          </div>
-
-          
-        </section>
-
-        {/* Workout History */}
-        <section className="mt-8">
-
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-2xl font-bold">
-                Your Workouts
-              </h2>
-
-              <p className="text-muted text-sm mt-1">
-                Your recent training sessions
-              </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                className="bg-primary hover:bg-primaryHover text-white font-semibold px-6 py-3 rounded-xl transition"
+                onClick={async () => {
+                  if (isWorkoutCompleted) {
+                    await startWorkout();
+                  } else if (isWorkoutCompleted === false) {
+                    return workoutId && navigate(`/start-workout/${workoutId}`);
+                  }
+                }}
+              >
+                {isWorkoutCompleted ? "Start Workout" : "Continue Workout"}
+              </button>
+              <button
+                type="button"
+                hidden={isWorkoutCompleted}
+                className="rounded-xl border border-red-400/30 bg-red-500/10 px-6 py-3 font-semibold text-red-400 transition hover:bg-red-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                onClick={() => {
+                  if (confirm("Are you sure you want to delete this workout")) {
+                    {
+                      deleteWorkout();
+                    }
+                  }
+                }}
+              >
+                Discard Workout
+              </button>
             </div>
-          </div>
+          </section>
 
-          
+          {/* Workout History */}
+          <section className="mt-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold">Your Workouts</h2>
 
-          <div className="space-y-4">
-          {<LoadWorkouts />}
-          </div>
+                <p className="text-muted text-sm mt-1">
+                  Your recent training sessions
+                </p>
+              </div>
+            </div>
 
-        </section>
-
+            <div className="space-y-4">{<LoadWorkouts />}</div>
+          </section>
+        </div>
       </div>
-    </div>
-    <div className="mt-32"></div>
+      <div className="mt-32"></div>
     </div>
   );
 }

@@ -109,7 +109,7 @@ const ExercisePage = ({
 
   function Exercises() {
     if (!search || search === "") {
-      return exercises.map((e) => {
+      return exercises.map((e, eIndex) => {
         return (
           <Exercise
             exercise={e}
@@ -750,6 +750,7 @@ const ExercisePage = ({
           <section className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-4 gap-12">
             {errorMessage && <p role="alert" className="col-span-full text-center text-text">{errorMessage}</p>}
             <Exercises setIsLoading={setIsLoading} isLoading={isLoading} />
+            <div className="col-span-full my-20"></div>
           </section>
         </>
       )}

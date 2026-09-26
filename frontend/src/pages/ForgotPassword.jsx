@@ -37,7 +37,7 @@ const ForgotPassword = () => {
             Forgot password?
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            No worries. Enter the email address associated with your Liftit
+            No worries. Enter the email address associated with your EliteLifts
             account to get started.
           </p>
         </div>

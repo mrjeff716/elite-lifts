@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon --exec \"node --use-system-ca\" src/server.js",
-    "dev": "node --watch src/server.js",
+    "dev": "node --env-file=.env.development --watch src/server.js",
     "test": "node --test src/*.test.js"
   },
   "type": "module",
