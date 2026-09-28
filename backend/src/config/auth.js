@@ -17,7 +17,7 @@ export const authCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   // The hosted API and frontend are on different sites.
-  sameSite: 'lax',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   path: '/',
   maxAge: 36 * 100 * 1000,
 }
