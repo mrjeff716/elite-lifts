@@ -32,6 +32,7 @@ getJwtSecret() // Fail at startup instead of accepting an insecure signing secre
 const allowedOrigins = [
   'https://myelitelifts.vercel.app',
   'http://localhost:5173',
+  'https://localhost'
 ]
 app.use(cors({ origin:allowedOrigins, credentials: true }))
 app.use(cookieParser())
