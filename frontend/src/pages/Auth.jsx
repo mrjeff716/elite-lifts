@@ -14,6 +14,7 @@ const Auth = ({ setUser }) => {
   const [pending, setPending] = useState(false)
   const [searchParams] = useSearchParams()
   const googleErrors = {
+    google_handoff_failed: 'Could not finish signing in to the app. Please try Google sign-in again.',
     google_failed: 'Google sign-in could not be completed. Please try again.',
     google_cancelled: 'Google sign-in was cancelled or expired. Please try again.',
     google_email_missing: 'Google did not provide an email address. Try another account.',

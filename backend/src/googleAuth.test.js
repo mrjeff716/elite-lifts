@@ -7,7 +7,7 @@ import { Passport } from 'passport'
 import { Strategy } from 'passport-google-oauth20'
 
 process.env.JWT_SECRET = 'test-only-secret-that-is-at-least-32-bytes-long'
-const { verifyGoogleUser, googleCallback } = await import('./controllers/googleAuth.js')
+const { verifyGoogleUser, googleCallback, startGoogleLogin, validateGoogleState } = await import('./controllers/googleAuth.js')
 const { default: User } = await import('./models/User.js')
 const { default: isAuth } = await import('./middleware/isAuth.js')
 const { getUser, postLogout, postSignup, postLogin } = await import('./controllers/authControllers.js')
@@ -25,8 +25,8 @@ test('Google callback, state, new/returning users, app cookie, refresh and logou
   User.findById = id => ({ select: () => users.find(u => u._id === id) })
   const passport = new Passport()
   const strategy = new Strategy({ clientID: 'test-client', clientSecret: 'test-secret',
-    callbackURL: 'http://localhost:3000/google/callback', state: true }, verifyGoogleUser)
-  // Exercise real Passport state validation and callbacks; no Google network or database writes.
+    callbackURL: 'http://localhost:3000/google/callback', state: false }, verifyGoogleUser)
+  // Exercise the production state middleware and Passport callbacks without Google/database writes.
   let profile = { id: 'google-1', displayName: 'Google User', emails: [{ value: 'google@example.com' }] }
   strategy._oauth2.getOAuthAccessToken = (code, params, done) => done(null, 'test-access', 'test-refresh', {})
   strategy.userProfile = (token, done) => done(null, profile)
@@ -34,11 +34,11 @@ test('Google callback, state, new/returning users, app cookie, refresh and logou
   const app = express()
   app.use(express.json(), cookieParser(), session({ secret: process.env.JWT_SECRET,
     resave: false, saveUninitialized: false }), passport.initialize())
-  app.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
-  app.get('/google/callback', googleCallback(passport))
+  app.get('/google', startGoogleLogin(passport))
+  app.get('/google/callback', validateGoogleState, googleCallback(passport))
   app.get('/user', isAuth, getUser)
   app.post('/logout', postLogout)
-  app.use((err, req, res, next) => res.status(err.statusCode || 500).json({ message: err.message }))
+  app.use((err, req, res, next) => res.status(err.statusCode || err.status || 500).json({ message: err.message }))
   const server = app.listen(0, '127.0.0.1')
   await new Promise(resolve => server.once('listening', resolve))
   const base = `http://127.0.0.1:${server.address().port}`
@@ -71,10 +71,10 @@ test('Google callback, state, new/returning users, app cookie, refresh and logou
     await login()
     assert.equal(users.length, 1)
     const invalid = await login('invalid-state')
-    assert.match(invalid.headers.get('location'), /google_cancelled/)
+    assert.equal(invalid.status, 400)
     assert.equal(invalid.headers.get('set-cookie'), null)
     const cancelled = await fetch(base + '/google/callback?error=access_denied', { redirect: 'manual' })
-    assert.match(cancelled.headers.get('location'), /google_cancelled/)
+    assert.equal(cancelled.status, 400)
     profile = { id: 'missing-email', displayName: 'No Email' }
     assert.match((await login()).headers.get('location'), /google_email_missing/)
     users.push({ _id: 'local-user', email: 'local@example.com', password: 'hash' })
@@ -93,6 +93,13 @@ test('Google callback, state, new/returning users, app cookie, refresh and logou
 })
 
 test('password signup logs in, rejects mismatches, and Google-only accounts get a helpful login error', async () => {
+  const originalFetch = globalThis.fetch
+  // Signup sends a welcome email; never contact the real mail provider in a test.
+  globalThis.fetch = (url, options) => {
+    if (String(url) === 'https://api.brevo.com/v3/smtp/email') return Promise.resolve(new Response('{}', { status: 201 }))
+    if (!String(url).startsWith('http://127.0.0.1:')) throw new Error('Unexpected external test request')
+    return originalFetch(url, options)
+  }
   const find = User.findOne
   const save = User.prototype.save
   User.findOne = async () => null
@@ -119,6 +126,7 @@ test('password signup logs in, rejects mismatches, and Google-only accounts get 
     assert.equal(login.status, 401)
     assert.match((await login.json()).message, /sign in with Google/)
   } finally {
+    globalThis.fetch = originalFetch
     User.findOne = find
     User.prototype.save = save
     await new Promise(resolve => server.close(resolve))

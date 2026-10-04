@@ -9,7 +9,7 @@ passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/google/callback',
-  state: true,
+  state: false,
 }, verifyGoogleUser))
 
 export default passport

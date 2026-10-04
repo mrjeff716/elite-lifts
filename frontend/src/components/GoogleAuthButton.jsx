@@ -1,9 +1,31 @@
 import axios from '../api'
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { googleHandoff } from '../utils/nativeGoogleAuth'
 
 export default function GoogleAuthButton({ signup = false, disabled = false }) {
+  const [opening, setOpening] = useState(false)
+  async function signIn() {
+    if (opening) return
+    setOpening(true)
+    let params
+    try {
+      const native = Capacitor.isNativePlatform()
+      params = native ? await googleHandoff.start() : new URLSearchParams({ platform: 'web' })
+      const url = `${axios.defaults.baseURL.replace(/\/$/, '')}/google?${params}`
+      if (native) await Browser.open({ url })
+      else window.location.assign(url)
+    } catch {
+      if (params?.get('app_state')) googleHandoff.cancel(params.get('app_state'))
+      toast.error('Could not open Google sign-in. Please try again.')
+    } finally { setOpening(false) }
+  }
+
   return (
-    <button type="button" disabled={disabled}
-      onClick={() => window.location.assign(`${axios.defaults.baseURL.replace(/\/$/, '')}/google`)}
+    <button type="button" disabled={disabled || opening}
+      onClick={signIn}
       className="relative flex h-11 w-full items-center justify-center gap-3 rounded-full border border-[#747775] bg-white px-5 text-sm font-medium text-[#1f1f1f] transition hover:bg-[#f2f2f2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4285f4] disabled:opacity-60"
       style={{ fontFamily: 'Arial, sans-serif' }}>
       <svg aria-hidden="true" width="20" height="20" viewBox="0 0 48 48" className="shrink-0">
