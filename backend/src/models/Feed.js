@@ -16,6 +16,11 @@ const feedSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  workoutId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "WorkoutSession",
+    required: true,
+  },
   userName: {
     type: String,
     required: true

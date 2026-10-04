@@ -78,8 +78,9 @@ export const getWorkout = async (req, res, next) => {
   try {
     const { id } = req.params
     const workoutSession = await WorkoutSession.findById(id)
-    res.status(200).json({ workout: workoutSession, message: 'Workout session found!' })
-    console.log(workoutSession)
+    const postedWorkout = await Feed.find({workoutId: id})
+    res.status(200).json({ workout: workoutSession, isWorkoutPostedToFeed: postedWorkout.length >= 1 ? true : false, message: 'Workout session found!' })
+    console.log(postedWorkout)
   } catch (error) {
     next(error)
   }
@@ -276,6 +277,7 @@ export const postWorkoutToFeed = async (req, res, next) => {
       null
     );
     console.log(mostFocused)
+    console.log(workout.workout._id)
 
     const user = await User.findById(req.userId)
     const newPost = await new Feed({
@@ -283,6 +285,7 @@ export const postWorkoutToFeed = async (req, res, next) => {
       description,
       exercises: includeExercises ? workout.workout.exercises : [],
       userId: workout.workout.userId,
+      workoutId: workout.workout._id,
       userName: user.name,
       mostFocusedMuscle: mostFocused.muscleGroup,
     })

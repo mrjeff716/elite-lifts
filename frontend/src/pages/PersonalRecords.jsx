@@ -56,7 +56,7 @@ const PersonalRecords = ({ onClose, pr }) => {
               </button>
             ))}
           </div>
-          <span className="text-xs text-muted">{pr[period].length} sample records</span>
+          <span className="text-xs text-muted">{pr[period].length} records</span>
         </div>
 
         {/* The buttons only change their selected appearance; data stays static. */}

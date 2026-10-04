@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from 'react'
 import axios from '../api'
 import { toast } from "react-hot-toast";
 import { useNavigate } from 'react-router'
+import { workoutPreferences } from '../utils/utils.js'
 
 const Settings = ({user, setUser}) => {
   const settingsPage = useRef(null)
@@ -33,7 +34,8 @@ const Settings = ({user, setUser}) => {
           email: user.email,
           workouts: user.workouts,
           weightUnit: user.weightUnit,
-          workoutsPerWeek: Number(user.workoutsPerWeek)
+          workoutsPerWeek: Number(user.workoutsPerWeek),
+          workoutPreference: user.workoutPreference
         },
         {
           headers: {
@@ -295,6 +297,32 @@ const Settings = ({user, setUser}) => {
                   />
                   <span className="text-xs text-muted">/ week</span>
                 </div>
+              </div>
+              <div className="p-5 sm:p-6">
+                <label htmlFor="workout-preferences" className="block text-sm font-medium">
+                  Workout preferences
+                </label>
+                <p id="workout-preferences-description" className="mt-1 text-xs leading-relaxed text-muted">
+                  Choose what you want to focus on in your training.
+                </p>
+                <select
+                  id="workout-preferences"
+                  name="workoutPreferences"
+                  defaultValue=""
+                  aria-describedby="workout-preferences-description"
+                  className="mt-3 w-full rounded-lg border border-border/10 bg-background px-3.5 py-3 text-sm text-text outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  onClick={(e) => {
+                    setUser(prev => {
+                      return {...prev, workoutPreference: e.target.value}
+                    })
+                    console.log(user)
+                  }}
+                >
+                  <option value="" disabled>Select your preference</option>
+                  {workoutPreferences.map(wp => {
+                    return <option value={wp}>{wp}</option>
+                  })}
+                </select>
               </div>
             </div>
           </section>

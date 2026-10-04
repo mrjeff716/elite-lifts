@@ -54,8 +54,6 @@ export default function WorkoutPage({ workout, user, setWorkout }) {
         ) {
           navigate("/auth");
         }
-      } finally {
-        setIsLoading(false);
       }
     }
     checkIfWorkoutHasStarted();

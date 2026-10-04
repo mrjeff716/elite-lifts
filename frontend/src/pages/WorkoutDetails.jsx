@@ -26,6 +26,7 @@ const WorkoutDetails = () => {
   const [isAiAnalysisLoading, setIsAiAnalysisLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
   const [isAiAnalysisOpen, setIsAiAnalysisOpen] = useState(true)
+  const [isDeletingWorkout, setIsDeletingWorkout] = useState(false)
   const workoutId = useParams().id;
   const navigate = useNavigate();
 
@@ -47,6 +48,7 @@ const WorkoutDetails = () => {
         }
         setIsLoading(false);
         setWorkout(res.data.workout);
+        console.log(res.data.isWorkoutPostedToFeed)
         setAiResponse(res.data.workout.aiAnalysis ?? "");
       } catch (error) {
         if (error.status === 401) {
@@ -56,6 +58,23 @@ const WorkoutDetails = () => {
     }
     getWorkout();
   }, []);
+
+  async function deleteWorkout() {
+    try {
+      const res = await axios.delete(`/api/delete-workout/${workout._id}`)
+      if (res.status === 200) {
+        toast.success(res.data.message)
+      } else if (res.status === 401 || res.statusCode === 401) {
+        return navigate('/auth', {replace: true})
+      }
+    } catch (error) {
+      if (error.status === 401 || error.statusCode === 401) {
+        return navigate('/auth', {replace: true})
+      }
+    } finally {
+      navigate('/workout')
+    }
+  }
 
   const date = !isLoading && new Date(workout.updatedAt);
 
@@ -181,13 +200,66 @@ const WorkoutDetails = () => {
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                   Workout recap
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setIsPostWorkoutOpen(true)}
-                  className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primaryHover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  Post workout
-                </button>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsPostWorkoutOpen(true)}
+                    className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primaryHover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    Post workout
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-400 transition hover:bg-red-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+                    onClick={() => setIsDeletingWorkout(true)}
+                  >
+                    Delete workout
+                  </button>
+                  <div hidden={!isDeletingWorkout} className="fixed inset-0 z-[100]">
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 bg-black/70 backdrop-blur-sm motion-safe:animate-backdrop-in"
+                    />
+                    <div className="relative grid h-full place-items-center overflow-y-auto p-4 sm:p-6">
+                      <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="delete-workout-title"
+                        aria-describedby="delete-workout-description"
+                        className="w-full max-w-md rounded-3xl border border-border/10 bg-card p-6 shadow-2xl shadow-black/40 motion-safe:animate-modal-in sm:p-8"
+                      >
+                        <div aria-hidden="true" className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-red-500/20 bg-red-500/10 text-red-400">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                            <path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6" />
+                          </svg>
+                        </div>
+                        <h2 id="delete-workout-title" className="text-xl font-semibold tracking-tight text-text">
+                          Delete this workout?
+                        </h2>
+                        <p id="delete-workout-description" className="mt-3 text-sm leading-6 text-muted">
+                          Are you sure you want to delete this workout? This action cannot be undone.
+                        </p>
+                        <div className="mt-6 flex items-center justify-end gap-3">
+                          <button
+                            type="button"
+                            className="flex-1 rounded-xl border border-border/20 px-5 py-3 text-sm font-semibold text-text transition hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:flex-none"
+                            onClick={() => setIsDeletingWorkout(false)}>
+                            No
+                          </button>
+                          <button
+                            type="button"
+                            className="flex-1 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 sm:flex-none"
+                            onClick={async() => {
+                              await deleteWorkout()
+                              setIsDeletingWorkout(false)
+                            }}>
+                            Yes
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <h1
                 id="workout-title"
