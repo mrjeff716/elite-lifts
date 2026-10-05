@@ -18,6 +18,7 @@ const Settings = ({user, setUser}) => {
   const deleteAccountDialog = useRef(null)
   const [isDeletingAccount, setIsDeletingAccount] = useState(false)
 
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const Settings = ({user, setUser}) => {
           workouts: user.workouts,
           weightUnit: user.weightUnit,
           workoutsPerWeek: Number(user.workoutsPerWeek),
-          workoutPreference: user.workoutPreference
+          workoutPreference: user.workoutPreference ?? ''
         },
         {
           headers: {
@@ -49,10 +50,7 @@ const Settings = ({user, setUser}) => {
           toast.success('Your changes have been saved!')
         }
       } catch (error) {
-        if (!error.status) {
-          error.status = 500
-          toast.error('Error, please try again later')
-        }
+        toast.error('Unable to save your changes. Please try again.')
       }
     }
 
@@ -307,20 +305,20 @@ const Settings = ({user, setUser}) => {
                 </p>
                 <select
                   id="workout-preferences"
-                  name="workoutPreferences"
-                  defaultValue=""
+                  name="workoutPreference"
+                  value={user.workoutPreference ?? ''}
                   aria-describedby="workout-preferences-description"
                   className="mt-3 w-full rounded-lg border border-border/10 bg-background px-3.5 py-3 text-sm text-text outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  onClick={(e) => {
+                  onChange={(e) => {
+                    const value = e.target.value
                     setUser(prev => {
-                      return {...prev, workoutPreference: e.target.value}
+                      return {...prev, workoutPreference: value}
                     })
-                    console.log(user)
                   }}
                 >
                   <option value="" disabled>Select your preference</option>
                   {workoutPreferences.map(wp => {
-                    return <option value={wp}>{wp}</option>
+                    return <option key={wp} value={wp}>{wp}</option>
                   })}
                 </select>
               </div>

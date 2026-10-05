@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema({
     required: false,
     defaultValue: 0
   },
-  workoutsPreference: {
+  workoutPreference: {
     type: String,
     required: false,
     enum: [

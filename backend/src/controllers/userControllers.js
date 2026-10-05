@@ -145,7 +145,7 @@ export const checkWorkoutStatus = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
-    const { id, email, name, workouts, weightUnit, workoutsPerWeek } = req.body
+    const { id, email, name, workouts, weightUnit, workoutsPerWeek, workoutPreference } = req.body
     let dbUser = await User.findById(id)
     dbUser.email = email
     dbUser.name = name
@@ -153,7 +153,10 @@ export const updateUser = async (req, res, next) => {
     dbUser.workouts = workouts
     dbUser.weightUnit = weightUnit
     dbUser.workoutsPerWeek = workoutsPerWeek
-    dbUser.save()
+    if (workoutPreference !== undefined) {
+      dbUser.workoutPreference = workoutPreference === '' ? undefined : workoutPreference
+    }
+    await dbUser.save()
     console.log('User saved successfully')
     res.status(201).json({ user: dbUser, message: 'Updated user successfully' })
   } catch (error) {
@@ -211,6 +214,7 @@ export const workoutsWeek = async (req, res, next) => {
 export const aiAnalysis = async (req, res, next) => {
   try {
     const { workouts } = req.body
+    const user = await User.findById(workouts[0].userId)
     console.log('request sent')
     let response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -223,7 +227,7 @@ export const aiAnalysis = async (req, res, next) => {
         "messages": [
           {
             "role": "user",
-            "content": prompt(workouts)
+            "content": prompt(workouts, user)
           }
         ],
         "reasoning": { "enabled": true }
