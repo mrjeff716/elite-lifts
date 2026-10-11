@@ -19,11 +19,11 @@ export const authCookieOptions = {
   // The hosted API and frontend are on different sites.
   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   path: '/',
-  maxAge: 36 * 100 * 1000,
+  maxAge: 36 * 100 * 1000 * 24 * 7,
 }
 
 export function setAuthCookie(res, user) {
   const token = jwt.sign({ email: user.email, id: user._id.toString() },
-    getJwtSecret(), { expiresIn: '1h', algorithm: 'HS256' })
+    getJwtSecret(), { expiresIn: '7d', algorithm: 'HS256' })
   res.cookie(authCookieName, token, authCookieOptions)
 }
