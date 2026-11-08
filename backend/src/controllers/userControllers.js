@@ -9,6 +9,10 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+export const getStatus = async(req, res, next) => {
+  return res.status(200).json({status: 'Running'})
+}
+
 export const getAllExercises = async (req, res, next) => {
   try {
     const primaryMuscles = req.params.primaryMuscles

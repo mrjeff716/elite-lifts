@@ -14,12 +14,15 @@ import {
   aiAnalysis,
   editWorkout,
   postWorkoutToFeed,
-  getPosts
+  getPosts,
+  getStatus
 } from '../controllers/userControllers.js'
 import isAuth from '../middleware/isAuth.js'
 import { check, body } from 'express-validator'
 
 const router = express.Router()
+
+router.get('/status', getStatus)
 
 router.get('/home/workouts-month', isAuth, workoutsMonth)
 
