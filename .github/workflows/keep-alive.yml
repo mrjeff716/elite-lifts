@@ -4,7 +4,6 @@ name: Keep Backend Alive
 on:
   schedule:
     - cron: "*/5 * * * *"
-
   workflow_dispatch:
 
 jobs:
@@ -12,13 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      - name: Debug files
+        run: |
+          pwd
+          ls -la
+          find . -iname "*keep*alive*"
+
       - name: Install requests
         run: pip install requests
 
-      - name: Run keep-alive script
-        run: python keep_alive.py
+      - name: Run Python script
+        run: python ./keep_alive.py
