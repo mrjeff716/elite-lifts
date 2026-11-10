@@ -465,7 +465,7 @@ const StartWorkout = ({ user, workout, setWorkout }) => {
                                 defaultValue={s.reps ? s.reps : 0}
                               />
                             </label>
-                            <label className="col-span-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm text-muted sm:col-span-1 sm:justify-center">
+                            <label className="col-span-1 flex min-h-11 cursor-pointer items-center gap-2 text-sm text-muted sm:col-span-1 sm:justify-center">
                               <input
                                 type="checkbox"
                                 checked={s.isPr === true}
